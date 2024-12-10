@@ -1,4 +1,5 @@
 # %%
+import argparse
 import os
 import numpy as np
 import pandas as pd
@@ -11,6 +12,25 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
+import warnings
+warnings.filterwarnings("ignore")
+
+# Get the arugments we need to avoid fixing the dataset path in code
+parser = argparse.ArgumentParser()
+parser.add_argument("--trainingdata", type=str, required=True, help='Dataset for training')
+args = parser.parse_args()
+mlflow.autolog()
+# %% [markdown]
+# ## First load the data
+# The first thing we need to do is load the data we're going to work with and have a quick look at a summary of it.
+# Pandas gives us a function to read CSV files.
+# **You might need update the location of the dataset to point to the correct place you saved it to!**
+# "../" means "back one directory from where we are now"
+# "./" means "from where we are now"
+
+# %%
+df = pd.read_csv(args.trainingdata)
+print(df)
 # %%
 train_df = pd.read_csv('../../train.csv')
 train_df.head()
