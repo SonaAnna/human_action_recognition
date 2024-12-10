@@ -7,145 +7,126 @@ subprocess.check_call([sys.executable, "-m", "pip", "install", "seaborn"])
 
 # Ensure tensorflow is installed
 subprocess.check_call([sys.executable, "-m", "pip", "install", "tensorflow"])
-
-
-import os
-import numpy as np
+# Step 1: Import necessary libraries
 import pandas as pd
-import seaborn as sns
-import tensorflow as tf
-from tensorflow import keras
+import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report, accuracy_score
 import argparse
 import mlflow
-# %%
 
-# for dirname, _, filenames in os.walk('/kaggle/input'):
-#     for filename in filenames:
-#         print(os.path.join(dirname, filename))
-# pd.set_option('display.max_columns', None)
-# sns.set_style('darkgrid')
-
-# %% 
 # Get the arugments we need to avoid fixing the dataset path in code
 parser = argparse.ArgumentParser()
 parser.add_argument("--trainingdata", type=str, required=True, help='Dataset path')
-parser.add_argument("--testdata", type=str, required=True, help='Dataset path')
 
 args = parser.parse_args()
 mlflow.autolog()
 mlflow.log_param("hello_param", "action_classifier")
 
-train_df=pd.read_csv(args.trainingdata)
-test_df = pd.read_csv(args.testdata)
+data_csv = pd.read_csv(args.trainingdata)
+print(data_csv.head())
 # %%
-train_df.head()
-
-# %%
-train_df.shape
-
-# %%
-
-test_df.head()
+# Step 2: Load the dataset
+df_full = data_csv
+df_full.shape
+df_full.head()
 
 # %%
-test_df.shape
+# Display the data types of the columns
+df_full.dtypes.value_counts()
+
 
 # %%
-X_train = train_df.iloc[:, :-2]
-y_train = train_df.iloc[:, -1]
-X_test = test_df.iloc[:, :-2]
-y_test = test_df.iloc[:, -1]
+# Exploratory Data Analysis (EDA)
+
+# Distribution of the target variable
+plt.figure(figsize=(8, 6))
+sns.countplot(x='Activity', data=df_full, palette='viridis')
+plt.title('Distribution of Activity')
+plt.xticks(rotation=45)
+plt.show()
+
 
 # %%
-class_label = y_train.value_counts()
-plt.figure(figsize=(10, 10))
-plt.xticks(rotation=75)
-sns.barplot(class_label)
+# Distribution of some of the numerical features
+features = ['tBodyAcc-mean()-X', 'tBodyAcc-mean()-Y', 'tBodyAcc-mean()-Z', 
+            'tBodyAcc-std()-X', 'tBodyAcc-std()-Y', 'tBodyAcc-std()-Z', 
+            'tBodyAcc-mad()-X', 'tBodyAcc-mad()-Y', 'tBodyAcc-mad()-Z']
+
+plt.figure(figsize=(15, 10))
+for i, feature in enumerate(features, 1):
+    plt.subplot(3, 3, i)
+    sns.histplot(df_full[feature], kde=True, color='blue', bins=30)
+    plt.title(f'Distribution of {feature}')
+    plt.xlabel('')
+    plt.ylabel('')
+plt.tight_layout()
+plt.show()
+
 
 # %%
-sc = StandardScaler()
-X_train = sc.fit_transform(X_train)
-X_test = sc.transform(X_test)
+# Correlation heatmap
+plt.figure(figsize=(12, 10))
+corr = df_full.corr().iloc[:20, :20]  # Selecting the first 20 features
+sns.heatmap(corr, cmap='coolwarm', annot=True, fmt=".2f", linewidths=0.5)
+plt.title('Correlation Matrix')
+plt.show()
+
+
 
 # %%
-label_encoder = LabelEncoder()
-y_train = label_encoder.fit_transform(y_train)
-y_train=pd.get_dummies(y_train).values
-y_test = label_encoder.fit_transform(y_test)
-y_test=pd.get_dummies(y_test).values
+# Step 4: Dimensionality Reduction (PCA)
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+# Separate features and target variable
+X = df_full.drop('Activity', axis=1)
+y = df_full['Activity']
+
+# Standardize the features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Apply PCA
+pca = PCA(n_components=0.95)
+X_pca = pca.fit_transform(X_scaled)
+
+# Check the number of components after PCA
+print("Number of components after PCA:", pca.n_components_)
+
 
 # %%
-y_train = np.array(y_train)
-y_test = np.array(y_test)
+# Step 5: SVM Model Development
 
-# %%
-pca = PCA(n_components=None)
-X_train = pca.fit_transform(X_train)
-X_test = pca.transform(X_test)
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report, accuracy_score
+from sklearn.model_selection import RandomizedSearchCV
 
-# %%
-model = keras.models.Sequential()
-model.add(keras.layers.Dense(units=64,activation='relu'))
-model.add(keras.layers.Dense(units=128,activation='relu'))
-model.add(keras.layers.Dense(units=64,activation='relu'))
-model.add(keras.layers.Dense(units=6,activation='softmax'))
+# Split the data into train and test sets
+X_train, X_test, y_train, y_test = train_test_split(X_pca, y, test_size=0.2, random_state=42)
 
-# %%
-model.compile(optimizer='adam',loss='categorical_crossentropy',metrics=['accuracy'])
+# Define the SVM model
+svm_model = SVC()
 
-# %%
-history = model.fit(X_train, y_train, batch_size=128, epochs=15, validation_split=0.2)
+param_grid = {'C': [0.1, 1, 10], 'gamma': [1, 0.1, 0.01], 'kernel': ['rbf', 'linear']}
 
-# %%
-## Loss Vs. Epochs
+# Randomized search with reduced parameter grid and n_iter
+random_search = RandomizedSearchCV(estimator=svm_model, param_distributions=param_grid, n_iter=5, cv=5, verbose=2, random_state=42)
 
-plt.figure(figsize=(10, 5))
-plt.plot(history.history['loss'], label='Train Loss')
-plt.plot(history.history['val_loss'], label='Test Loss')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.legend(['Train Loss', 'Validation Loss']);
+# Fit the randomized search to the data
+random_search.fit(X_train, y_train)
 
-# %%
-## Accuracy Vs. Epochs
+# Make predictions
+y_pred = random_search.predict(X_test)
 
-plt.figure(figsize=(10, 5))
-plt.plot(history.history['accuracy'], label='Train Accuracy')
-plt.plot(history.history['val_accuracy'], label='Test Accuracy')
-plt.xlabel('Epochs')
-plt.ylabel('Accuracy')
-plt.legend(['Train Accuracy', 'Validation Accuracy']);
-
-# %%
-pred = model.predict(X_test)
-predic = []
-for p in pred:
-    p = np.argmax(p)
-    predic.append(p)
-predic = np.array(predic)
-
-# %%
-y_test[0]
-y_test_label = []
-for i in range(len(y_test)):
-    for ind, j in enumerate(y_test[i]):
-        if j == 1:
-            y_test_label.append(ind)
-y_test_label = np.array(y_test_label)
-
-# %%
-print(classification_report(y_test_label, predic))
-
-# %%
-plt.figure(figsize=(10, 10))
-sns.heatmap(confusion_matrix(y_test_label, predic), annot=True, fmt='g')
-
-# %%
-print("Accuracy Score: ", accuracy_score(y_test_label, predic))
-
-# %%
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
