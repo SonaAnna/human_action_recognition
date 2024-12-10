@@ -1,9 +1,6 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 code: .
-command:
-  pip install -r requirements.txt
-  python --version
-  python model.py
+command: python model.py --trainingdata ${{ inputs.training_data }} --testdata ${{ inputs.test_data }}
 inputs:
   training_data:
     type: uri_file
