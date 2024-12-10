@@ -21,6 +21,7 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 import argparse
+import mlflow
 # %%
 
 # for dirname, _, filenames in os.walk('/kaggle/input'):
@@ -30,31 +31,25 @@ import argparse
 # sns.set_style('darkgrid')
 
 # %% 
-# Add argparse for command-line arguments
-#def parse_args():
- #   parser = argparse.ArgumentParser(description="Human Action Recognition Model Training")
-  #  parser.add_argument('--train_data', type=str, required=True, help="C:\\Users\\lenovo\\Documents\\assignment\\Intelligence\\human_action_recognition\\Data\\train.csv")
-   # parser.add_argument('--test_data', type=str, required=True, help="C:\\Users\\lenovo\\Documents\\assignment\\Intelligence\\human_action_recognition\\Data\\test.csv")
-  #  parser.add_argument('--batch_size', type=int, default=128, help="Batch size for training")
-    #parser.add_argument('--epochs', type=int, default=15, help="Number of epochs for training")
-   # return parser.parse_args()
+# Get the arugments we need to avoid fixing the dataset path in code
+parser = argparse.ArgumentParser()
+parser.add_argument("--trainingdata", type=str, required=True, help='Dataset path')
+parser.add_argument("--testdata", type=str, required=True, help='Dataset path')
 
-#args = parse_args()
+args = parser.parse_args()
+mlflow.autolog()
+mlflow.log_param("hello_param", "action_classifier")
 
-# %% 
-# Load the train and test datasets based on the command-line arguments
-#train_df = pd.read_csv(args.train_data)
-#test_df = pd.read_csv(args.test_data)
-
+train_df=pd.read_csv(args.trainingdata)
+test_df = pd.read_csv(args.testdata)
 # %%
-train_df = pd.read_csv('C:\\Users\\lenovo\\Documents\\assignment\\Intelligence\\human_action_recognition\\Data\\train.csv')
 train_df.head()
 
 # %%
 train_df.shape
 
 # %%
-test_df = pd.read_csv('C:\\Users\\lenovo\\Documents\\assignment\\Intelligence\\human_action_recognition\\Data\\test.csv')
+
 test_df.head()
 
 # %%
