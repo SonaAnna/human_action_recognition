@@ -16,6 +16,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.svm import SVC
+from sklearn.metrics import classification_report, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 from sklearn.metrics import classification_report, accuracy_score
 import argparse
 import mlflow
@@ -126,7 +127,25 @@ random_search.fit(X_train, y_train)
 # Make predictions
 y_pred = random_search.predict(X_test)
 
+# %% Calculate metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, average='weighted')
+recall = recall_score(y_test, y_pred, average='weighted')
+f1 = f1_score(y_test, y_pred, average='weighted')
+
+# For multi-class classification, use one-vs-rest (ovr) for ROC AUC
+y_prob = random_search.predict_proba(X_test)
+roc_auc = roc_auc_score(y_test, y_prob, multi_class='ovr', average='weighted')
+
+# %% Log metrics to MLflow
+mlflow.log_metric("accuracy", accuracy)
+mlflow.log_metric("precision", precision)
+mlflow.log_metric("recall", recall)
+mlflow.log_metric("f1_score", f1)
+mlflow.log_metric("roc_auc", roc_auc)
+
 # Evaluate the model
 accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy:", accuracy)
 print("\nClassification Report:\n", classification_report(y_test, y_pred))
+
