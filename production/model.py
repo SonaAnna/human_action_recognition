@@ -5,6 +5,10 @@ import sys
 # Ensure seaborn is installed
 subprocess.check_call([sys.executable, "-m", "pip", "install", "seaborn"])
 
+# Ensure tensorflow is installed
+subprocess.check_call([sys.executable, "-m", "pip", "install", "tensorflow"])
+
+
 import os
 import numpy as np
 import pandas as pd
