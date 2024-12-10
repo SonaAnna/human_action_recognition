@@ -20,14 +20,14 @@ from sklearn.metrics import accuracy_score, confusion_matrix, classification_rep
 # sns.set_style('darkgrid')
 
 # %%
-train_df = pd.read_csv('C:\\Users\\lenovo\\Documents\\assignment\\Intelligence\\human_action_recognition\\production\\train.csv')
+train_df = pd.read_csv('C:\\Users\\lenovo\\Documents\\assignment\\Intelligence\\human_action_recognition\\Data\\train.csv')
 train_df.head()
 
 # %%
 train_df.shape
 
 # %%
-test_df = pd.read_csv('C:\\Users\\lenovo\\Documents\\assignment\\Intelligence\\human_action_recognition\\production\\test.csv')
+test_df = pd.read_csv('C:\\Users\\lenovo\\Documents\\assignment\\Intelligence\\human_action_recognition\\Data\\test.csv')
 test_df.head()
 
 # %%
