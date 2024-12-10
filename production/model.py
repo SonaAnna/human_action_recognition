@@ -1,5 +1,6 @@
-# %%
+# %% 
 import argparse
+import mlflow
 import os
 import numpy as np
 import pandas as pd
@@ -15,128 +16,126 @@ from sklearn.metrics import accuracy_score, confusion_matrix, classification_rep
 import warnings
 warnings.filterwarnings("ignore")
 
-# Get the arugments we need to avoid fixing the dataset path in code
+# Get the arguments for dataset path
 parser = argparse.ArgumentParser()
-parser.add_argument("--trainingdata", type=str, required=True, help='Dataset for training')
+parser.add_argument("--trainingdata", type=str, required=True, help='Path to the training dataset (CSV file)')
+parser.add_argument("--testdata", type=str, required=True, help='Path to the testing dataset (CSV file)')
 args = parser.parse_args()
+
+# Start mlflow autologging
 mlflow.autolog()
+
 # %% [markdown]
-# ## First load the data
-# The first thing we need to do is load the data we're going to work with and have a quick look at a summary of it.
-# Pandas gives us a function to read CSV files.
-# **You might need update the location of the dataset to point to the correct place you saved it to!**
-# "../" means "back one directory from where we are now"
-# "./" means "from where we are now"
+# ## Load the data
+# Now, let's load the datasets based on the provided paths.
 
-# %%
-df = pd.read_csv(args.trainingdata)
-print(df)
-# %%
-train_df = pd.read_csv('../../train.csv')
-train_df.head()
-print("hello")
+# %% 
+train_df = pd.read_csv(args.trainingdata)
+test_df = pd.read_csv(args.testdata)
 
-# %%
-train_df.shape
+# Check the first few rows of the training dataset
+print(train_df.head())
 
-# %%
-test_df = pd.read_csv('../../test.csv')
-test_df.head()
+# Check the first few rows of the test dataset
+print(test_df.head())
 
-# %%
-test_df.shape
+# %% 
+# Split features and labels for training and test data
+X_train = train_df.iloc[:, :-1]  # Features (all columns except the last one)
+y_train = train_df.iloc[:, -1]   # Labels (last column)
 
-# %%
-X_train = train_df.iloc[:, :-2]
-y_train = train_df.iloc[:, -1]
-X_test = test_df.iloc[:, :-2]
-y_test = test_df.iloc[:, -1]
+X_test = test_df.iloc[:, :-1]    # Features (all columns except the last one)
+y_test = test_df.iloc[:, -1]     # Labels (last column)
 
-# %%
+# %% 
+# Visualize class distribution using Seaborn
 class_label = y_train.value_counts()
 plt.figure(figsize=(10, 10))
 plt.xticks(rotation=75)
-sns.barplot(class_label)
+sns.barplot(x=class_label.index, y=class_label.values)
 
-# %%
+# %% 
+# Standardize features using StandardScaler
 sc = StandardScaler()
 X_train = sc.fit_transform(X_train)
 X_test = sc.transform(X_test)
 
-# %%
+# %% 
+# Encode labels using LabelEncoder and convert to one-hot encoding
 label_encoder = LabelEncoder()
 y_train = label_encoder.fit_transform(y_train)
-y_train=pd.get_dummies(y_train).values
-y_test = label_encoder.fit_transform(y_test)
-y_test=pd.get_dummies(y_test).values
+y_train = pd.get_dummies(y_train).values  # One-hot encoding
+y_test = label_encoder.transform(y_test)
+y_test = pd.get_dummies(y_test).values  # One-hot encoding
 
-# %%
-y_train = np.array(y_train)
-y_test = np.array(y_test)
-
-# %%
-pca = PCA(n_components=None)
+# %% 
+# Apply PCA for dimensionality reduction (optional)
+pca = PCA(n_components=None)  # You can set the number of components as needed
 X_train = pca.fit_transform(X_train)
 X_test = pca.transform(X_test)
 
-# %%
-model = keras.models.Sequential()
-model.add(keras.layers.Dense(units=64,activation='relu'))
-model.add(keras.layers.Dense(units=128,activation='relu'))
-model.add(keras.layers.Dense(units=64,activation='relu'))
-model.add(keras.layers.Dense(units=6,activation='softmax'))
+# %% 
+# Build the neural network model
+model = keras.models.Sequential([
+    keras.layers.Dense(units=64, activation='relu', input_shape=(X_train.shape[1],)),
+    keras.layers.Dense(units=128, activation='relu'),
+    keras.layers.Dense(units=64, activation='relu'),
+    keras.layers.Dense(units=y_train.shape[1], activation='softmax')  # Output layer with softmax for classification
+])
 
-# %%
-model.compile(optimizer='adam',loss='categorical_crossentropy',metrics=['accuracy'])
+# %% 
+# Compile the model
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-# %%
+# %% 
+# Train the model
 history = model.fit(X_train, y_train, batch_size=128, epochs=15, validation_split=0.2)
 
-# %%
-## Loss Vs. Epochs
-
+# %% 
+# Plot Loss vs. Epochs
 plt.figure(figsize=(10, 5))
 plt.plot(history.history['loss'], label='Train Loss')
-plt.plot(history.history['val_loss'], label='Test Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
-plt.legend(['Train Loss', 'Validation Loss']);
+plt.legend(['Train Loss', 'Validation Loss'])
+plt.title("Loss vs. Epochs")
+plt.show()
 
-# %%
-## Accuracy Vs. Epochs
-
+# %% 
+# Plot Accuracy vs. Epochs
 plt.figure(figsize=(10, 5))
 plt.plot(history.history['accuracy'], label='Train Accuracy')
-plt.plot(history.history['val_accuracy'], label='Test Accuracy')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy')
-plt.legend(['Train Accuracy', 'Validation Accuracy']);
+plt.legend(['Train Accuracy', 'Validation Accuracy'])
+plt.title("Accuracy vs. Epochs")
+plt.show()
 
-# %%
+# %% 
+# Make predictions on the test data
 pred = model.predict(X_test)
-predic = []
-for p in pred:
-    p = np.argmax(p)
-    predic.append(p)
-predic = np.array(predic)
+predic = np.argmax(pred, axis=1)  # Convert to class labels (not probabilities)
 
-# %%
-y_test[0]
-y_test_label = []
-for i in range(len(y_test)):
-    for ind, j in enumerate(y_test[i]):
-        if j == 1:
-            y_test_label.append(ind)
-y_test_label = np.array(y_test_label)
+# %% 
+# Convert one-hot encoded labels back to integer labels
+y_test_label = np.argmax(y_test, axis=1)
 
-# %%
+# %% 
+# Classification report and confusion matrix
+print("Classification Report:")
 print(classification_report(y_test_label, predic))
 
-# %%
+# %% 
+# Plot confusion matrix
 plt.figure(figsize=(10, 10))
-sns.heatmap(confusion_matrix(y_test_label, predic), annot=True, fmt='g')
+sns.heatmap(confusion_matrix(y_test_label, predic), annot=True, fmt='g', cmap='Blues')
+plt.title("Confusion Matrix")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.show()
 
-# %%
+# %% 
+# Accuracy score
 print("Accuracy Score: ", accuracy_score(y_test_label, predic))
-
-
