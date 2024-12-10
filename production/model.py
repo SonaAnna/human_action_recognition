@@ -1,4 +1,10 @@
 # %%
+import subprocess
+import sys
+
+# Ensure seaborn is installed
+subprocess.check_call([sys.executable, "-m", "pip", "install", "seaborn"])
+
 import os
 import numpy as np
 import pandas as pd
