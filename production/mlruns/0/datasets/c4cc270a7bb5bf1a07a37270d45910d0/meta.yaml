@@ -1,0 +1,9 @@
+digest: d3d29ee0
+name: dataset
+profile: '{"features_shape": [7352, 561], "features_size": 4124472, "features_nbytes":
+  32995776}'
+schema: '{"mlflow_tensorspec": {"features": "[{\"type\": \"tensor\", \"tensor-spec\":
+  {\"dtype\": \"float64\", \"shape\": [-1, 561]}}]", "targets": null}}'
+source: '{"tags": {"mlflow.user": "lenovo", "mlflow.source.name": ".\\model.py", "mlflow.source.type":
+  "LOCAL", "mlflow.source.git.commit": "55f74f2d6e7896d101b10cd5198d40c8bbef91df"}}'
+source_type: code
