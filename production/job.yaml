@@ -1,6 +1,6 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 code: .
-command:>
+command:
   pip install -r requirements.txt
   python --version
   python model.py --trainingdata ${{ inputs.training_data }}
@@ -14,4 +14,4 @@ inputs:
 environment: azureml://registries/azureml/environments/sklearn-1.1/versions/14
 compute: COM774-B00953832-COMPUTE
 experiment_name: COM774-B00953832-exp
-description: COM774-B00953832-exp demo
+description: COM774-B00953832-experiment demo

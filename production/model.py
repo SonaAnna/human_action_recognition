@@ -14,6 +14,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix, classification_rep
 # %%
 train_df = pd.read_csv('../../train.csv')
 train_df.head()
+print("hello")
 
 # %%
 train_df.shape
