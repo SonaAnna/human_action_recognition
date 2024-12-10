@@ -31,20 +31,20 @@ import argparse
 
 # %% 
 # Add argparse for command-line arguments
-def parse_args():
-    parser = argparse.ArgumentParser(description="Human Action Recognition Model Training")
-    parser.add_argument('--train_data', type=str, required=True, help="C:\\Users\\lenovo\\Documents\\assignment\\Intelligence\\human_action_recognition\\Data\\train.csv")
-    parser.add_argument('--test_data', type=str, required=True, help="C:\\Users\\lenovo\\Documents\\assignment\\Intelligence\\human_action_recognition\\Data\\test.csv")
-    parser.add_argument('--batch_size', type=int, default=128, help="Batch size for training")
-    parser.add_argument('--epochs', type=int, default=15, help="Number of epochs for training")
-    return parser.parse_args()
+#def parse_args():
+ #   parser = argparse.ArgumentParser(description="Human Action Recognition Model Training")
+  #  parser.add_argument('--train_data', type=str, required=True, help="C:\\Users\\lenovo\\Documents\\assignment\\Intelligence\\human_action_recognition\\Data\\train.csv")
+   # parser.add_argument('--test_data', type=str, required=True, help="C:\\Users\\lenovo\\Documents\\assignment\\Intelligence\\human_action_recognition\\Data\\test.csv")
+  #  parser.add_argument('--batch_size', type=int, default=128, help="Batch size for training")
+    #parser.add_argument('--epochs', type=int, default=15, help="Number of epochs for training")
+   # return parser.parse_args()
 
-args = parse_args()
+#args = parse_args()
 
 # %% 
 # Load the train and test datasets based on the command-line arguments
-train_df = pd.read_csv(args.train_data)
-test_df = pd.read_csv(args.test_data)
+#train_df = pd.read_csv(args.train_data)
+#test_df = pd.read_csv(args.test_data)
 
 # %%
 train_df = pd.read_csv('C:\\Users\\lenovo\\Documents\\assignment\\Intelligence\\human_action_recognition\\Data\\train.csv')
