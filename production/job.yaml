@@ -3,7 +3,7 @@ code: .
 command:
   pip install -r requirements.txt
   python --version
-  python model.py --trainingdata ${{ inputs.training_data }}
+  python model.py
 inputs:
   training_data:
     type: uri_file
