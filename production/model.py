@@ -16,8 +16,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.svm import SVC
-from sklearn.metrics import classification_report, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import classification_report, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.preprocessing import LabelBinarizer
 import argparse
 import mlflow
 
@@ -133,9 +134,13 @@ precision = precision_score(y_test, y_pred, average='weighted')
 recall = recall_score(y_test, y_pred, average='weighted')
 f1 = f1_score(y_test, y_pred, average='weighted')
 
-# For multi-class classification, use one-vs-rest (ovr) for ROC AUC
-y_prob = random_search.predict_proba(X_test)
-roc_auc = roc_auc_score(y_test, y_prob, multi_class='ovr', average='weighted')
+# For multi-class classification, calculate ROC AUC using decision_function
+lb = LabelBinarizer()
+y_test_binarized = lb.fit_transform(y_test)
+
+# Get decision scores and calculate ROC AUC
+decision_scores = random_search.decision_function(X_test)
+roc_auc = roc_auc_score(y_test_binarized, decision_scores, average='weighted', multi_class='ovr')
 
 # %% Log metrics to MLflow
 mlflow.log_metric("accuracy", accuracy)
@@ -144,8 +149,15 @@ mlflow.log_metric("recall", recall)
 mlflow.log_metric("f1_score", f1)
 mlflow.log_metric("roc_auc", roc_auc)
 
+
 # Evaluate the model
 accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy:", accuracy)
 print("\nClassification Report:\n", classification_report(y_test, y_pred))
 
+# %% Print metrics to console
+print(f"Accuracy: {accuracy}")
+print(f"Precision: {precision}")
+print(f"Recall: {recall}")
+print(f"F1 Score: {f1}")
+print(f"ROC AUC Score: {roc_auc}")
