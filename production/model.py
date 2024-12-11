@@ -27,6 +27,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--trainingdata", type=str, required=True, help='Dataset path')
 
 args = parser.parse_args()
+mlflow.set_tracking_uri("http://127.0.0.1:8080")
 mlflow.autolog()
 mlflow.log_param("hello_param", "action_classifier")
 
