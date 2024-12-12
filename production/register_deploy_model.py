@@ -40,7 +40,7 @@ run_model = Model(
 # Register the model
 ml_client.models.create_or_update(run_model)
 
-registered_model_name="HAR-model-registered"
+registered_model_name="HAR-model"
 
 # Let's pick the latest version of the model
 latest_model_version = max(
