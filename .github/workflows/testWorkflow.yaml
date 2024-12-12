@@ -11,31 +11,7 @@ jobs:
         uses: actions/checkout@v4
       - run: echo "Repository cloned, I think I'm ready. The files look like this:"
       - name: List files
-        run: ls
-
-on:
-  push:
-    branches:    
-      - 'staging'  # Trigger the workflow on push to the staging branch
-      - '!main'    # Exclude main branch
-
-jobs:
-  HAC-CICD-Workflow:
-    runs-on: ubuntu-latest  # Using Ubuntu runner for the CI/CD pipeline
-    
-    steps:
-      # Initial greeting and repository checkout
-      - run: echo "Hi! I'm running because of a ${{ github.event_name }} event."
-      - run: echo "Checking out the repository from ${{ github.repository }}."
-      
-      - name: Clone repository code
-        uses: actions/checkout@v4
-        
-      - run: echo "Repository cloned, I think I'm ready. The files look like this:"
-      
-      - name: List files
-        run: ls ${{ github.workspace }}
-        
+        run: ls  
       # Azure login using GitHub secrets
       - name: Log into Azure
         uses: azure/login@v1
@@ -57,4 +33,4 @@ jobs:
       - name: create job
         run: az ml job create --file job.yaml --resource-group COM774_B00953832 --workspace-name COM774_B00953832
 
-    
+      
