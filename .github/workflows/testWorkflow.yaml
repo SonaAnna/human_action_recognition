@@ -21,7 +21,7 @@ jobs:
       - name: Test azure login by getting details
         run: az account show  # Verifying the Azure login
 
-      # Install dependencies to run
+      # Install dependencies
       - name: Install dependencies
         run: pip install -r requirements.txt  # Install the packages from your requirements.txt file
 
@@ -32,16 +32,16 @@ jobs:
       # Create Azure ML Job and capture the job name
       - name: create job
         run: |
-          export azureml_job_name=$(az ml job create --file production/job1.yaml --resource-group com774-b00953832-rg --workspace-name com774-b00953832-es --query name -o tsv)
-          echo "azureml_job_name=${azureml_job_name}" >> $GITHUB_ENV
+          export azure_job_name=$(az ml job create --file production/job1.yaml --resource-group com774-b00953832-rg --workspace-name com774-b00953832-es --query name -o tsv)
+          echo "azure_job_name=${azure_job_name}" >> $GITHUB_ENV
       # Wait for the Azure ML job to complete
       - name: Wait for Azure ML Job
         id: wait-for-job
         run: |
           job_status="NotStarted"
           while [ "$job_status" != "Completed" ]; do
-            echo "Job Name: $azureml_job_name"
-            job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azureml_job_name --query 'status' -o tsv)
+            echo "Job Name: $azure_job_name"
+            job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azure_job_name --query 'status' -o tsv)
             echo "Job Status: $job_status"
             if [ "$job_status" != "Completed" ]; then
               sleep 60  # Adjust the sleep interval as needed
@@ -52,12 +52,12 @@ jobs:
       - name: Check Azure ML Job Status
         id: check-job-status
         run: |
-          job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azureml_job_name --query 'status' -o tsv)
+          job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azure_job_name --query 'status' -o tsv)
           echo "Final Job Status: $job_status"
       # Register, Deploy and Test the model
       - name: Register and Deploy the Model
         id: register-and-deploy
-        run: python production/register_deploy_model.py --job_name $azureml_job_name
+        run: python production/register_deploy_model.py --job_name $azure_job_name
       # Check the test accuracy and run the job again if the accuracy is less than 95%
       - name: Check Test Accuracy and Run the Job Again
         id: check-accuracy-and-run
@@ -77,16 +77,16 @@ jobs:
       # Create Job and capture the job name in an environment variable
       - name: create second job
         run: |
-          export azureml_job_name=$(az ml job create --file production/job2.yaml --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --query name -o tsv)
-          echo "azureml_job_name=${azureml_job_name}" >> $GITHUB_ENV
-      # Wait for the Azure ML job to finish
+          export azure_job_name=$(az ml job create --file production/job2.yaml --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --query name -o tsv)
+          echo "azure_job_name=${azure_job_name}" >> $GITHUB_ENV
+      # Wait for the Azure ML job to complete
       - name: Wait for Azure ML retrain Job
         id: wait-for-retrain-job
         run: |
           job_status="NotStarted"
           while [ "$job_status" != "Completed" ]; do
-            echo "Job Name: $azureml_job_name"
-            job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azureml_job_name --query 'status' -o tsv)
+            echo "Job Name: $azure_job_name"
+            job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azure_job_name --query 'status' -o tsv)
             echo "Job Status: $job_status"
             if [ "$job_status" != "Completed" ]; then
               sleep 60  # Adjust the sleep interval as needed
@@ -97,12 +97,12 @@ jobs:
       - name: Check Azure ML Re-Job Status
         id: check-retrain-job-status
         run: |
-          job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azureml_job_name --query 'status' -o tsv)
+          job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azure_job_name --query 'status' -o tsv)
           echo "Final Job Status: $job_status"
       # Register, Deploy and Test the model
       - name: Register and Deploy the Model
         id: register-deploy-test
-        run: python production/register_deploy_model.py --deploy_name har_blue_deployment --job_name $azureml_job_name
+        run: python production/register_deploy_model.py --deploy_name har_blue_deployment --job_name $azure_job_name
       # Disply the test accuracy
       - name: Check Test Accuracy and Dsiplay
         id: check-accuracy-and-display
