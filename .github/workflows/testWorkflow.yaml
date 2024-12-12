@@ -32,7 +32,7 @@ jobs:
       # Create Azure ML Job and capture the job name
       - name: create job
         run: |
-          export azure_job_name=$(az ml job create --file production/job1.yaml --resource-group com774_b00953882_rg --workspace-name com774_b00953832_ws --query name -o tsv)
+          export azure_job_name=$(az ml job create --file production/job1.yaml --resource-group com774-b00953832-rg --workspace-name com774-b00953832-es --query name -o tsv)
           echo "azure_job_name=${azure_job_name}" >> $GITHUB_ENV
       # Wait for the Azure ML job to complete
       - name: Wait for Azure ML Job
@@ -41,7 +41,7 @@ jobs:
           job_status="NotStarted"
           while [ "$job_status" != "Completed" ]; do
             echo "Job Name: $azure_job_name"
-            job_status=$(az ml job show --resource-group com774_b00953882_rg --workspace-name com774_b00953832_ws --name $azure_job_name --query 'status' -o tsv)
+            job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azure_job_name --query 'status' -o tsv)
             echo "Job Status: $job_status"
             if [ "$job_status" != "Completed" ]; then
               sleep 60  # Adjust the sleep interval as needed
@@ -52,7 +52,7 @@ jobs:
       - name: Check Azure ML Job Status
         id: check-job-status
         run: |
-          job_status=$(az ml job show --resource-group com774_b00953882_rg --workspace-name com774_b00953832_ws --name $azure_job_name --query 'status' -o tsv)
+          job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azure_job_name --query 'status' -o tsv)
           echo "Final Job Status: $job_status"
       # Register, Deploy and Test the model
       - name: Register and Deploy the Model
@@ -77,7 +77,7 @@ jobs:
       # Create Job and capture the job name in an environment variable
       - name: create second job
         run: |
-          export azure_job_name=$(az ml job create --file production/job2.yaml --resource-group com774_b00953882_rg --workspace-name com774_b00953832_ws --query name -o tsv)
+          export azure_job_name=$(az ml job create --file production/job2.yaml --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --query name -o tsv)
           echo "azure_job_name=${azure_job_name}" >> $GITHUB_ENV
       # Wait for the Azure ML job to complete
       - name: Wait for Azure ML retrain Job
@@ -86,7 +86,7 @@ jobs:
           job_status="NotStarted"
           while [ "$job_status" != "Completed" ]; do
             echo "Job Name: $azure_job_name"
-            job_status=$(az ml job show --resource-group com774_b00953882_rg --workspace-name com774_b00953832_ws --name $azure_job_name --query 'status' -o tsv)
+            job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azure_job_name --query 'status' -o tsv)
             echo "Job Status: $job_status"
             if [ "$job_status" != "Completed" ]; then
               sleep 60  # Adjust the sleep interval as needed
@@ -97,7 +97,7 @@ jobs:
       - name: Check Azure ML Re-Job Status
         id: check-retrain-job-status
         run: |
-          job_status=$(az ml job show --resource-group com774_b00953882_rg --workspace-name com774_b00953832_ws --name $azure_job_name --query 'status' -o tsv)
+          job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azure_job_name --query 'status' -o tsv)
           echo "Final Job Status: $job_status"
       # Register, Deploy and Test the model
       - name: Register and Deploy the Model
