@@ -41,7 +41,7 @@ jobs:
           job_status="NotStarted"
           while [ "$job_status" != "Completed" ]; do
             echo "Job Name: $azure_job_name"
-            job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azure_job_name --query 'name':status' -o tsv)
+            job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azure_job_name --query 'status' -o tsv)
             echo "Job Status: $job_status"
             if [ "$job_status" != "Completed" ]; then
               sleep 60  # Adjust the sleep interval as needed
