@@ -16,7 +16,7 @@ jobs:
       - name: Log into Azure
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}  # Azure credentials stored in GitHub Secrets
+          creds: ${{ secrets.sonaannasecretkey }}  # Azure credentials stored in GitHub Secrets
           
       - name: Test azure login by getting details
         run: az account show  # Verifying the Azure login
