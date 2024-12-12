@@ -34,20 +34,6 @@ jobs:
         run: |
           export azure_job_name=$(az ml job create --file production/job1.yaml --resource-group com774-b00953832-rg --workspace-name com774-b00953832-es --query name -o tsv)
           echo "azure_job_name=${azure_job_name}" >> $GITHUB_ENV
-      # Wait for the Azure ML job to complete
-      - name: Wait for Azure ML Job
-        id: wait-for-job
-        run: |
-          job_status="NotStarted"
-          while [ "$job_status" != "Completed" ]; do
-            echo "Job Name: $azure_job_name"
-            job_status=$(az ml job show --resource-group com774-b00953832-rg --workspace-name com774-b00953832-ws --name $azure_job_name --query 'status' -o tsv)
-            echo "Job Status: $job_status"
-            if [ "$job_status" != "Completed" ]; then
-              sleep 60  # Adjust the sleep interval as needed
-            fi
-          done
-        shell: bash
       # Check the final status of the Azure ML job
       - name: Check Azure ML Job Status
         id: check-job-status
