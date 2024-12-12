@@ -13,7 +13,7 @@ jobs:
       - name: List files
         run: ls  
       # Azure login using GitHub secrets
-      - name: Log into Azure
+      - name: Log into the Azure
         uses: azure/login@v1
         with:
           creds: ${{ secrets.SONAANNASECRETKEY }}  # Azure credentials stored in GitHub Secrets
