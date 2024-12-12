@@ -32,7 +32,7 @@ job_name = args.job_name
 
 run_model = Model(
     path=f"azureml://jobs/{job_name}/outputs/artifacts/paths/model/",
-    name="HAR_model",
+    name="HAR-model",
     description="model created using workflow",
     type=AssetTypes.MLFLOW_MODEL,
 )
@@ -40,7 +40,7 @@ run_model = Model(
 # Register the model
 ml_client.models.create_or_update(run_model)
 
-registered_model_name="HAR_model"
+registered_model_name="HAR-model-registered"
 
 # Let's pick the latest version of the model
 latest_model_version = max(
@@ -49,7 +49,7 @@ latest_model_version = max(
 print(latest_model_version)
 
 # Create a unique name for the endpoint
-online_endpoint_name = "endpoint_har_" + str(uuid.uuid4())[:8]
+online_endpoint_name = "endpoint-har-" + str(uuid.uuid4())[:8]
 
 # define an online endpoint
 endpoint = ManagedOnlineEndpoint(
@@ -77,7 +77,7 @@ model = ml_client.models.get(name=registered_model_name, version=latest_model_ve
 # if you run into an out of quota error, change the instance_type to a comparable VM that is available.\
 # Learn more on https://azure.microsoft.com/en-us/pricing/details/machine-learning/.
 blue_deployment = ManagedOnlineDeployment(
-    name="har_blue_deployment",
+    name="har-blue-deployment",
     endpoint_name=online_endpoint_name,
     model=model,
     instance_type="Standard_D2as_v4",
