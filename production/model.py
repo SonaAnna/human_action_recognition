@@ -2,16 +2,13 @@
 import subprocess
 import sys
 
-# Ensure seaborn is installed
-subprocess.check_call([sys.executable, "-m", "pip", "install", "seaborn"])
+# Ensure seaborn is removed if unnecessary
+# Ensure tensorflow is removed if unnecessary
 
-# Ensure tensorflow is installed
-subprocess.check_call([sys.executable, "-m", "pip", "install", "tensorflow"])
 # Step 1: Import necessary libraries
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -22,10 +19,10 @@ from sklearn.preprocessing import LabelBinarizer
 import argparse
 import mlflow
 
-# Get the arugments we need to avoid fixing the dataset path in code
+# Get the arguments we need to avoid fixing the dataset path in code
 parser = argparse.ArgumentParser()
 parser.add_argument("--trainingdata", type=str, required=True, help='Dataset path')
-parser.add_argument("--retraining", type=float, required=True, help='setiing retraining parameter true or false')
+parser.add_argument("--retraining", type=float, required=True, help='Setting retraining parameter true or false')
 
 args = parser.parse_args()
 mlflow.autolog()
@@ -35,28 +32,29 @@ data_csv = pd.read_csv(args.trainingdata)
 
 print(data_csv.head())
 # %%
-# Step 2: dataset loading
+# Step 2: Dataset loading
 df_full = data_csv
 df_full.shape
 df_full.head()
 
 # %%
-# find the data types 
+# Find the data types 
 df_full.dtypes.value_counts()
-
 
 # %%
 # Exploratory Data Analysis (EDA)
 
 plt.figure(figsize=(8, 6))
-sns.countplot(x='Activity', data=df_full, palette='viridis')
-plt.title('Activity Distibution')
+activity_counts = df_full['Activity'].value_counts()
+plt.bar(activity_counts.index, activity_counts.values, color='blue')
+plt.title('Activity Distribution')
 plt.xticks(rotation=45)
+plt.xlabel('Activity')
+plt.ylabel('Count')
 plt.show()
 
-
 # %%
-# Distribution of numerical vaues
+# Distribution of numerical values
 features = ['tBodyAcc-mean()-X', 'tBodyAcc-mean()-Y', 'tBodyAcc-mean()-Z', 
             'tBodyAcc-std()-X', 'tBodyAcc-std()-Y', 'tBodyAcc-std()-Z', 
             'tBodyAcc-mad()-X', 'tBodyAcc-mad()-Y', 'tBodyAcc-mad()-Z']
@@ -64,23 +62,24 @@ features = ['tBodyAcc-mean()-X', 'tBodyAcc-mean()-Y', 'tBodyAcc-mean()-Z',
 plt.figure(figsize=(15, 10))
 for i, feature in enumerate(features, 1):
     plt.subplot(3, 3, i)
-    sns.histplot(df_full[feature], kde=True, color='blue', bins=30)
+    plt.hist(df_full[feature], bins=30, color='blue', alpha=0.7)
     plt.title(f'Distribution of {feature}')
-    plt.xlabel('')
-    plt.ylabel('')
+    plt.xlabel(feature)
+    plt.ylabel('Frequency')
 plt.tight_layout()
 plt.show()
-
 
 # %%
 # Correlation matrix
 plt.figure(figsize=(12, 10))
-corr = df_full.corr().iloc[:20, :20]  # choosing the 20 features
-sns.heatmap(corr, cmap='coolwarm', annot=True, fmt=".2f", linewidths=0.5)
+corr = df_full.corr().iloc[:20, :20]  # Choosing the 20 features
+plt.imshow(corr, cmap='coolwarm', interpolation='none')
+plt.colorbar(label='Correlation Coefficient')
 plt.title('Correlation Matrix')
+plt.xticks(range(corr.shape[1]), corr.columns, rotation=90)
+plt.yticks(range(corr.shape[0]), corr.columns)
+plt.tight_layout()
 plt.show()
-
-
 
 # %%
 # Dimensionality Reduction (PCA)
@@ -96,7 +95,7 @@ y = df_full['Activity']
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-# Applying pca value 
+# Applying PCA value 
 if args.retraining == True:
     pcavalue = 0.95
 else:
@@ -105,18 +104,17 @@ pca = PCA(n_components=pcavalue)
 X_pca = pca.fit_transform(X_scaled)
 
 # Checking components number
-print("components number after PCA:", pca.n_components_)
-
+print("Components number after PCA:", pca.n_components_)
 
 # %%
-#SVM Model 
+# SVM Model 
 
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.model_selection import RandomizedSearchCV
 
-# Spliting train and test datasets
+# Splitting train and test datasets
 X_train, X_test, y_train, y_test = train_test_split(X_pca, y, test_size=0.2, random_state=42)
 
 # SVM model
@@ -130,7 +128,7 @@ random_search = RandomizedSearchCV(estimator=svm_model, param_distributions=para
 # Fitting the data
 random_search.fit(X_train, y_train)
 
-#predictions
+# Predictions
 y_pred = random_search.predict(X_test)
 
 # %% Calculating metrics
@@ -142,7 +140,7 @@ f1 = f1_score(y_test, y_pred, average='weighted')
 lb = LabelBinarizer()
 y_test_binarized = lb.fit_transform(y_test)
 
-# decision scores & ROC AUC
+# Decision scores & ROC AUC
 decision_scores = random_search.decision_function(X_test)
 roc_auc = roc_auc_score(y_test_binarized, decision_scores, average='weighted', multi_class='ovr')
 
@@ -153,8 +151,7 @@ mlflow.log_metric("recall", recall)
 mlflow.log_metric("f1_score", f1)
 mlflow.log_metric("roc_auc", roc_auc)
 
-
-#model evaluation
+# Model evaluation
 accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy:", accuracy)
 print("\nClassification Report:\n", classification_report(y_test, y_pred))
