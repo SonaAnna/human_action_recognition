@@ -123,8 +123,8 @@ random_search = RandomizedSearchCV(estimator=svm_model, param_distributions=para
 random_search.fit(X_train, y_train)
 
 #save the model 
-model_path = "model"
-mlflow.sklearn.save_model(random_search.best_estimator_, model_path)
+#model_path = "model"
+#mlflow.sklearn.save_model(random_search.best_estimator_, model_path)
 
 # Predictions
 y_pred = random_search.predict(X_test)
