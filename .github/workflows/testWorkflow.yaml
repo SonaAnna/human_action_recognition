@@ -13,8 +13,8 @@ jobs:
       - name: List files
         run: ls
 
-name: GitHub Actions human_action_recognition
-run-name: ${{ github.actor }} workflow HAC-CICD
+name: GitHub Actions Test
+run-name: ${{ github.actor }} workflow test
 
 on:
   push:
