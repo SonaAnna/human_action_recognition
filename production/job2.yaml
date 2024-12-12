@@ -1,0 +1,11 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+code: .
+command: python model.py --trainingdata ${{ inputs.training_data }} --retraining 1
+inputs:
+  training_data:
+    type: uri_file
+    path: azureml:human-activity-recognition:1
+environment: azureml://registries/azureml/environments/sklearn-1.1/versions/14
+compute: com774-compute
+experiment_name: COM774-B00953832-exp
+description: COM774-B00953832-experiment demo

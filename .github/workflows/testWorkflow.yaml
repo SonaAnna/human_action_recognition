@@ -31,6 +31,8 @@ jobs:
         
       # Create Azure ML Job and capture the job name
       - name: create job
-        run: az ml job create --file production/job.yaml --resource-group COM774_B00953832 --workspace-name COM774_B00953832
+        run: |
+          export azure_job_name=$(az ml job create --file production/job.yaml --resource-group com774_b00953882_rg --workspace-name com774_b00953832_ws --query name -o tsv)
+          echo "azure_job_name=${azure_job_name}" >> $GITHUB_ENV
 
       
