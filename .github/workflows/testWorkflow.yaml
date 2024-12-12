@@ -34,5 +34,3 @@ jobs:
         run: |
           export azure_job_name=$(az ml job create --file production/job1.yaml --resource-group com774_b00953882_rg --workspace-name com774_b00953832_ws --query name -o tsv)
           echo "azure_job_name=${azure_job_name}" >> $GITHUB_ENV
-
-      
