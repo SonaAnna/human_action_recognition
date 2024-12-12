@@ -21,7 +21,7 @@ jobs:
       - name: Test azure login by getting details
         run: az account show  # Verifying the Azure login
 
-      # Install dependencies
+      # Install dependencies to run
       - name: Install dependencies
         run: pip install -r requirements.txt  # Install the packages from your requirements.txt file
 
