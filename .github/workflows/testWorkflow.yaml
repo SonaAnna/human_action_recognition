@@ -58,7 +58,7 @@ jobs:
       # Register, Deploy and Test the model
       - name: Register and Deploy the Model
         id: register-and-deploy
-        run: python production/register_deploy_model.py --job_name $azure_job_name
+        #run: python production/register_deploy_model.py --job_name $azure_job_name
       # Check the test accuracy and run the job again if the accuracy is less than 95%
       - name: Check Test Accuracy and Run the Job Again
         id: check-accuracy-and-run
