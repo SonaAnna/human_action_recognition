@@ -80,7 +80,7 @@ blue_deployment = ManagedOnlineDeployment(
     name="har-blue-deployment",
     endpoint_name=online_endpoint_name,
     model=model,
-    instance_type="Standard_D2as_v4",
+    instance_type="Standard_DS1_v2",
     instance_count=1,
 )
 
