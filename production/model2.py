@@ -125,9 +125,3 @@ for i in range(3):
     # Plot the confusion matrix
     cm = confusion_matrix(Y_test.values,y_pred)
     plot_confusion_matrix(cm, np.unique(y_pred), i)  # plotting confusion matrix
-
-# # Now, register the model in Azure ML workspace
-# # Replace with your workspace details
-# subscription_id = 'bf0717bf-dfd1-4019-a2b6-aa46e3899a4d'
-# resource_group = 'assignment-snobin'
-# workspace_name = 'assignmentsnobin'
