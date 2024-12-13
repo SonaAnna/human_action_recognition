@@ -24,8 +24,8 @@ args = parser.parse_args()
 ml_client = MLClient(
     credential=credential,
     subscription_id = '8273dae1-4494-4ccb-bccf-e5465e3c3482',
-    resource_group_name="com774-b00953832-rg",
-    workspace_name="com774-b00953832-ws",
+    resource_group_name="com774-b00953832-rg-",
+    workspace_name="com774-b00953832-ws-",
 )
 
 job_name = args.job_name    
