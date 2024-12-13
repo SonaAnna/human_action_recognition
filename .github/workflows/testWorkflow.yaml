@@ -36,7 +36,7 @@ jobs:
           echo "azure_job_name=${azure_job_name}" >> $GITHUB_ENV
 
       # Wait for the Azure ML job to complete
-      - name: Wait for Azure ML retrain Job
+      - name: Wait for Azure ML train Job
         id: wait-for-job
         run: |
           job_status="NotStarted"
@@ -113,4 +113,3 @@ jobs:
         id: unit-test-and-integration-test
         run: python -m unittest test_train test_train_integration          
 
-        
