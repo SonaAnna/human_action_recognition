@@ -70,8 +70,8 @@ for i in range(3):
         parameters = {'C':np.arange(10,61,20), 'penalty':['l2','l1']}
         lr_classifier = LogisticRegression()
     else:
-        # Create Decision Tree Classifier
-        print("Training with Decision Tree Model")   
+        # Create knn model 
+        print("Training with k-nearest neighbor model")   
         parameters = {'weights': ['uniform', 'distance'],'n_neighbors': np.arange(1, 21)}
         lr_classifier = KNeighborsClassifier()
     lr_classifier_rs = RandomizedSearchCV(lr_classifier, param_distributions=parameters, cv=5,random_state = 42)
