@@ -34,10 +34,10 @@ jobs:
         run: |
           export azure_job_name=$(az ml job create --file production/job1.yaml --resource-group com774-b00953832-rg- --workspace-name com774-b00953832-ws- --query name -o tsv)
           echo "azure_job_name=${azure_job_name}" >> $GITHUB_ENV
-          
+
       # Wait for the Azure ML job to complete
       - name: Wait for Azure ML retrain Job
-        id: wait-for-retrain-job
+        id: wait-for-job
         run: |
           job_status="NotStarted"
           while [ "$job_status" != "Completed" ]; do
